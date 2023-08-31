@@ -52,7 +52,7 @@ jobs:
       matrix:
         command: ${{ fromJson(inputs.commands) }}
     steps:
-      - uses: XoCedillo/crashcourse-reusable-workflows/@main
+      - uses: XoCedillo/crashcourse-reusable-workflows@main
         name: Running action ${{ matrix.command }}
         with:
           project-name: ${{ inputs.project-name }}
