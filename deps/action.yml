@@ -1,0 +1,26 @@
+name: "Fetch dependencies"
+description: "Playground"
+
+inputs:
+  go-version:
+    description: "Go version to be used in the checks"
+    required: false
+    default: "1.20.5"
+  download-flags:
+    description: additional go mod download flags
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: true
+
+    - name: Pull Go dependencies
+      shell: bash
+      run: go mod download ${{ inputs.download-flags }}

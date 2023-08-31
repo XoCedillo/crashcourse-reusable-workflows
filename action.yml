@@ -1,0 +1,60 @@
+name: "Practice Go Action"
+description: ""
+
+inputs:
+  command:
+    description: "Make task to execute"
+    required: true
+  go-version:
+    description: "Go version to be used in the checks"
+    required: false
+    default: "1.21.0"
+  modules:
+    description: "module relative paths defined in this repository."
+    required: false
+    default: "./..."
+  tools-dir:
+    description: "directory where the go tools are installed"
+    default: "/tmp/tools"
+    required: false
+  project-name:
+    description: "Project name"
+    required: true
+  # lint inputs
+  golint-timeout:
+    description: "golangci-lint timeout flag"
+    required: false
+    default: "4m"
+  # test inputs
+  test-flags:
+    description: "flags to provide to gotest"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: true
+
+    - uses: XoCedillo/github-actions-reusable-workflows/test@main
+      if: inputs.command == 'test'
+      with:
+        modules: ${{ inputs.modules }}
+        go-version: ${{ inputs.go-version }}
+        tools-dir: ${{ inputs.tools-dir }}
+        test-flags: ${{ inputs.test-flags }}
+
+    - uses: XoCedillo/github-actions-reusable-workflows/lint@main
+      if: inputs.command == 'lint'
+      with:
+        modules: ${{inputs.modules }}
+        go-version: ${{inputs.go-version }}
+        tools-dir: ${{inputs.tools-dir }}
+        golint-timeout: ${{inputs.golint-timeout }}

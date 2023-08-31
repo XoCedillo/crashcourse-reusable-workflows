@@ -1,0 +1,41 @@
+name: "Install go binary tool"
+description: ""
+
+inputs:
+  modules:
+    description: "module relative paths defined in this repository."
+    required: false
+    default: "./..."
+  go-version:
+    description: "Go version to be used in the checks"
+    required: false
+    default: "1.20.5"
+  tools-dir:
+    description: "directory where the go tools are installed"
+    default: "/tmp/tools"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: false
+
+    - name: Check for previously built gotest
+      id: cache-tool
+      uses: actions/cache@v3
+      with:
+        path: ${{ inputs.tools-dir }}
+        key: gotest-latest-${{ inputs.go-version }}
+
+    - name: Install gotest @latest
+      shell: bash
+      run: GOBIN=${{ inputs.tools-dir }} go install -v github.com/rakyll/gotest@latest
+      if: steps.cache-tool.outputs.cache-hit != 'true'
+
+    - name: run gotest
+      shell: bash
+      run: ${{ inputs.tools-dir }}/gotest ${{ inputs.modules }}

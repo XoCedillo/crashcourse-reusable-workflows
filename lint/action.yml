@@ -1,0 +1,45 @@
+name: "lint action"
+description: "runs golangci-lint for the defined modules"
+
+inputs:
+  modules:
+    description: "module relative paths defined in this repository."
+    required: false
+    default: "./..."
+  go-version:
+    description: "Go version to be used in the checks"
+    required: false
+    default: "1.20.5"
+  tools-dir:
+    description: "directory where the go tools are installed"
+    default: "/tmp/tools"
+    required: false
+  golint-timeout:
+    description: "golangci-lint timeout flag"
+    required: false
+    default: "4m"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: false
+
+    - name: Check for previously built golangci-lint
+      id: cache-tool
+      uses: actions/cache@v3
+      with:
+        path: ${{ inputs.tools-dir }}
+        key: golangci-lint-latest-${{ inputs.go-version }}
+
+    - name: Install golangci-lint @latest
+      shell: bash
+      run: GOBIN=${{ inputs.tools-dir }} go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      if: steps.cache-tool.outputs.cache-hit != 'true'
+
+    - name: Runs golangci-lint
+      shell: bash
+      run: ${{ inputs.tools-dir }}/golangci-lint run --timeout=${{ inputs.golint-timeout }} -v ${{ inputs.modules }}

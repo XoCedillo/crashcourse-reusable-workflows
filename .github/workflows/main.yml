@@ -1,0 +1,64 @@
+name: Go Checks
+on:
+  workflow_call:
+    inputs:
+      commands:
+        required: true
+        type: string
+        description: "A JSON array of commands to run. Available commands: test|lint"
+      project-name:
+        type: string
+        description: "Project name"
+        required: true
+      go-version:
+        type: string
+        description: "Go version to be used in the checks"
+        required: false
+        default: "1.21.0"
+      modules:
+        type: string
+        description: "module relative paths defined in this repository."
+        required: false
+        default: "./..."
+      tools-dir:
+        type: string
+        description: "directory where the go tools are installed"
+        default: "/tmp/tools"
+        required: false
+      golint-timeout:
+        type: string
+        description: "golangci-lint timeout flag"
+        required: false
+        default: "4m"
+      # test inputs
+      test-flags:
+        type: string
+        description: "flags to provide to gotest"
+        required: false
+        default: ""
+
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: XoCedillo/github-actions-reusable-workflows/deps@main
+        with:
+          go-version: ${{ inputs.go-version }}
+  checks:
+    runs-on: ${{ inputs.runner-label }}
+    needs: deps
+    strategy:
+      fail-fast: true
+      matrix:
+        command: ${{ fromJson(inputs.commands) }}
+    steps:
+      - uses: XoCedillo/github-actions-reusable-workflows/@main
+        name: Running action ${{ matrix.command }}
+        with:
+          project-name: ${{ inputs.project-name }}
+          command: ${{ matrix.command }}
+          go-version: ${{inputs.go-version}}
+          modules: ${{inputs.modules}}
+          tools-dir: ${{inputs.tools-dir}}
+          golint-timeout: ${{inputs.golint-timeout}}
+          test-flags: ${{inputs.test-flags}}
