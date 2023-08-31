@@ -41,7 +41,7 @@ jobs:
   deps:
     runs-on: ubuntu-latest
     steps:
-      - uses: XoCedillo/github-actions-reusable-workflows/deps@main
+      - uses: XoCedillo/crashcourse-reusable-workflows/deps@main
         with:
           go-version: ${{ inputs.go-version }}
   checks:
@@ -52,7 +52,7 @@ jobs:
       matrix:
         command: ${{ fromJson(inputs.commands) }}
     steps:
-      - uses: XoCedillo/github-actions-reusable-workflows/@main
+      - uses: XoCedillo/crashcourse-reusable-workflows/@main
         name: Running action ${{ matrix.command }}
         with:
           project-name: ${{ inputs.project-name }}

@@ -43,7 +43,7 @@ runs:
         go-version: ${{ inputs.go-version }}
         cache: true
 
-    - uses: XoCedillo/github-actions-reusable-workflows/test@main
+    - uses: XoCedillo/crashcourse-reusable-workflows/test@main
       if: inputs.command == 'test'
       with:
         modules: ${{ inputs.modules }}
@@ -51,7 +51,7 @@ runs:
         tools-dir: ${{ inputs.tools-dir }}
         test-flags: ${{ inputs.test-flags }}
 
-    - uses: XoCedillo/github-actions-reusable-workflows/lint@main
+    - uses: XoCedillo/crashcourse-reusable-workflows/lint@main
       if: inputs.command == 'lint'
       with:
         modules: ${{inputs.modules }}
