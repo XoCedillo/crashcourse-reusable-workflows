@@ -1,5 +1,5 @@
 name: "Practice Go Action"
-description: ""
+description: "Main action to call other composite actions"
 
 inputs:
   command:
@@ -43,6 +43,7 @@ runs:
         go-version: ${{ inputs.go-version }}
         cache: true
 
+    # If the command is test, it will call ./test/action.yml
     - uses: XoCedillo/crashcourse-reusable-workflows/test@main
       if: inputs.command == 'test'
       with:
@@ -51,6 +52,7 @@ runs:
         tools-dir: ${{ inputs.tools-dir }}
         test-flags: ${{ inputs.test-flags }}
 
+        # If the command is lint, it will call ./lint/action.yml:
     - uses: XoCedillo/crashcourse-reusable-workflows/lint@main
       if: inputs.command == 'lint'
       with:
